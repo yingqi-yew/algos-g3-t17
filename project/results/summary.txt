@@ -1,0 +1,8 @@
+Policy            On-time Delivered   Late Undelivered On-time rate       Daily range  Std dev Km per parcel
+baseline             4349      6421   2072        9446       27.41%   24.75% - 31.18%     1.61         16.21
+edf                  6296      6296      0        9571       39.68%   31.81% - 44.86%     4.47         16.48
+window_nn           13064     13064      0        2803       82.33%   76.35% - 86.95%     2.89          5.96
+window_nn_2opt      13117     13117      0        2750       82.67%   76.48% - 88.00%     2.85          5.86
+
+Total parcels (20 days): 15867
+2-opt vs NN: better on 8 days, worse on 7, same on 5, net +53 parcels

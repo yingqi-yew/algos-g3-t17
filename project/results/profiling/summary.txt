@@ -1,0 +1,4 @@
+Policy           Predicted cost     Calls   Measured ops   Predicted ops      r
+edf              O(P + N log N)       620         118408          118408   1.00
+window_nn        O(P + NK)           2330        2064314         2265296   1.00
+window_nn_2opt   O(P + NK + K^3)     2420        8720215        14431760   0.95

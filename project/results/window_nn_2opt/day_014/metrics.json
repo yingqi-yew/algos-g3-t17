@@ -1,0 +1,11 @@
+{
+  "on_time_rate": 0.7648,
+  "on_time_parcels": 595,
+  "total_parcels": 778,
+  "delivered_parcels": 595,
+  "early_parcels": 0,
+  "late_parcels": 0,
+  "undelivered_parcels": 183,
+  "km_driven": 3774.6,
+  "km_per_delivered_parcel": 6.344
+}
