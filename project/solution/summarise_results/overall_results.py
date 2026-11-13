@@ -1,8 +1,4 @@
-"""Add up every policy's metrics.json files into one results table.
-
-Run from the project root, after the simulator and performance monitor:
-    python3 -m solution.summarise_results.overall_results
-"""
+"""Totals across the 20 days for each policy. Needs results/<policy>/day_XXX/metrics.json."""
 
 import json
 import statistics

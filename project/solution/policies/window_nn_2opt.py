@@ -1,10 +1,4 @@
-"""Window-aware nearest neighbour + 2-opt.
-
-Build a route with window-aware nearest neighbour, then apply first-improvement
-2-opt (reverse the stops between positions i and j) to shorten it. A reversal is
-kept only if every parcel still arrives inside its window and the trip stays
-within range and the 18:00 return. At most three improving moves are accepted.
-"""
+"""NN route, then first-improvement 2-opt (max 3 moves). Reversals must keep all parcels on time."""
 
 from typing import Dict, List
 
@@ -39,10 +33,7 @@ def dispatch(parcel: Dict[str, Parcel], context: SimulationContext) -> List[str]
                 if not within_trip_limits(new_distance, departure, context):
                     continue
 
-                # NN only adds on-time parcels, so 2-opt keeps every parcel
-                # on time and accepts a reversal only if it shortens the trip.
-                # Adding the same distances in a different order can differ by a
-                # rounding error, so a route only counts as shorter by a real margin.
+                # small tolerance for float rounding when summing in a different order
                 shorter = new_distance < distance - 1e-8
 
                 if all_on_time and shorter:

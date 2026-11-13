@@ -1,10 +1,4 @@
-"""Window-aware Earliest Deadline First (EDF).
-
-Sort the waiting parcels by window end, then arrival time and parcel ID, and
-scan the sorted list once. A parcel is added only if it fits capacity, the trip
-stays within range and the 18:00 return, and it would arrive inside its
-delivery window. Skipped parcels are left for a later round.
-"""
+"""EDF policy: go through waiting parcels by window end, take the ones that pass check_parcel."""
 
 from typing import Dict, List
 
@@ -13,10 +7,6 @@ from solution.policies.helpers import HUB, check_parcel, get_waiting
 
 
 def dispatch(parcel: Dict[str, Parcel], context: SimulationContext) -> List[str]:
-    """Build one trip by scanning waiting parcels in deadline order.
-
-    Inputs are snapshots and are never modified.
-    """
     departure = context["current_time"] + context["departure_delay"]
 
     waiting = get_waiting(parcel)
@@ -36,8 +26,6 @@ def dispatch(parcel: Dict[str, Parcel], context: SimulationContext) -> List[str]
     travelled = 0.0
     location = HUB
 
-    # Single pass over the sorted list: capacity, range, return cutoff and
-    # delivery window are all checked by check_parcel.
     for parcel_id in waiting:
         record = parcel[parcel_id]
         feasible, leg = check_parcel(record, location, load, travelled, departure, context)

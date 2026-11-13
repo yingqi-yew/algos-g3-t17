@@ -1,14 +1,5 @@
-"""Count the basic operations of each policy and compare them with Big-O.
-
-Run from the project root:
-    python3 -m solution.summarise_results.run_profile
-
-Instead of timing with a clock (which changes from run to run), we count the
-steps our complexity analysis is built on:
-  - feasibility checks: one parcel checked for capacity, range, cutoff and window
-  - 2-opt stop checks: one stop re-checked when 2-opt tests a reordered route
-The counts are the same on every run and every computer.
-"""
+"""Op counts per dispatch call vs predicted Big-O.
+1 op = one check_parcel call, or one stop in evaluate_route (2-opt)."""
 
 import math
 
@@ -23,7 +14,6 @@ POLICIES = {
     "window_nn_2opt": window_nn_2opt.dispatch,
 }
 
-# The Big-O time complexity of each policy, from our complexity analysis.
 PREDICTED_COST = {
     "edf": "O(P + N log N)",
     "window_nn": "O(P + NK)",
@@ -33,9 +23,7 @@ PREDICTED_COST = {
 operations = 0   # operations counted during the current dispatch call
 
 
-# ---------- Counting versions of the helper functions ----------
-# They do exactly the same work as the real ones, but add 1 to the counter
-# for every parcel checked and every stop re-checked.
+# wrap the real helpers so each parcel check / stop re-check adds 1 to the counter
 
 real_check_parcel = helpers.check_parcel
 real_evaluate_route = helpers.evaluate_route
@@ -59,8 +47,6 @@ edf.check_parcel = counting_check_parcel
 window_nn_2opt.evaluate_route = counting_evaluate_route
 
 
-# ---------- Predictions ----------
-
 def predicted_operations(name, N, K):
     """Predicted number of counted operations for one call."""
     if name == "edf":
@@ -71,7 +57,7 @@ def predicted_operations(name, N, K):
 
 
 def correlation(xs, ys):
-    """Pearson correlation: close to 1 means the two lists rise together."""
+    """Pearson r."""
     mean_x = sum(xs) / len(xs)
     mean_y = sum(ys) / len(ys)
     top = 0
@@ -83,8 +69,6 @@ def correlation(xs, ys):
         sum_y = sum_y + (y - mean_y) ** 2
     return top / math.sqrt(sum_x * sum_y)
 
-
-# ---------- Running each policy ----------
 
 current_policy = None
 records = []   # one (N, K, operations) entry per dispatch call

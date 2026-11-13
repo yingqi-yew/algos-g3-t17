@@ -13,58 +13,48 @@ def _to_minutes(hhmm: str) -> float:
     """Convert an "HH:MM" string to minutes after midnight, e.g. "17:00" -> 1020."""
     hours, minutes = hhmm.split(":")
     return int(hours) * 60 + int(minutes)
- 
- 
+
+
 def calculate_metrics(
     parcels: List[Dict[str, str]],
     distances: List[Dict[str, str]],
     config: Dict[str, Any],
     events: List[Dict[str, Any]],
 ) -> Dict[str, Any]:
-    """Main metric: on-time delivery rate.
- 
-    A parcel is on time if it is delivered with
-    window_start <= delivery time <= window_end (both ends included).
-    The rate divides by ALL parcels in the day's file, so undelivered
-    parcels count as not on time and a policy cannot score well by
-    delivering only a few easy parcels.
- 
-    Secondary metrics: parcels delivered, early, late and undelivered,
-    and kilometres driven per delivered parcel.
-    """
- 
-    # Parcel ID -> its record, for O(1) lookup when matching delivery events.
+    """on_time_rate = on-time parcels / all parcels in the day (window ends inclusive).
+    Also returns early/late/undelivered counts and km driven."""
+
     parcel_by_id = {row["parcel_id"]: row for row in parcels}
- 
+
     # (origin, destination) -> distance in km.
     distance = {
         (row["location_1"], row["location_2"]): float(row["dist"])
         for row in distances
     }
- 
+
     on_time = early = late = 0
     trip_stops: Dict[Any, List[str]] = {}  # (vehicle, trip) -> locations in delivery order
- 
+
     for event in events:
         if event["event_type"] == "hub_departure":
             trip_stops[(event["vehicle_id"], event["trip_id"])] = []
- 
+
         elif event["event_type"] == "delivery":
             record = parcel_by_id[event["parcel_id"]]
             start = _to_minutes(record["delivery_window_start"])
             end = _to_minutes(record["delivery_window_end"])
- 
+
             if event["time"] < start:
                 early += 1
             elif event["time"] > end:
                 late += 1
             else:
                 on_time += 1
- 
+
             trip_stops[(event["vehicle_id"], event["trip_id"])].append(
                 record["delivery_location_id"]
             )
- 
+
     # Distance driven: HUB -> each stop in order -> HUB, for every trip.
     total_km = 0.0
     for stops in trip_stops.values():
@@ -72,10 +62,10 @@ def calculate_metrics(
         for stop in stops + ["HUB"]:
             total_km += distance[(location, stop)]
             location = stop
- 
+
     total = len(parcels)
     delivered = on_time + early + late
- 
+
     return {
         "on_time_rate": round(on_time / total, 4) if total else 0.0,
         "on_time_parcels": on_time,
@@ -104,7 +94,6 @@ def main(argv: Optional[List[str]] = None) -> int:
     try:
         parcel_path, distance_path, config_path = day_input_paths(args.data, args.day)
         output = args.output if args.output is not None else args.log.with_name("metrics.json")
-        # The input files all live in the data directory, so this also protects them.
         if output.resolve() == args.data.resolve() or args.data.resolve() in output.resolve().parents:
             raise ValueError("report output must be outside the input data directory")
         if output.resolve() == args.log.resolve():
