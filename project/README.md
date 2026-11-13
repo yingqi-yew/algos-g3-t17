@@ -1,5 +1,4 @@
-# IS115 Project README
-# IS115 Project: Last-Mile Delivery Planning
+# IS115 Project README: Last-Mile Delivery Planning
 
 **Team G3-T17:** SUH Sumin, YEW Ying Qi, Tejas S/O ILANGKUMARAN
 
