@@ -16,7 +16,7 @@ def dispatch(parcel: Dict[str, Parcel], context: SimulationContext) -> List[str]
 
     departure = context["current_time"] + context["departure_delay"]
 
-    # Accept at most three improving moves.
+    # accept at most three improving moves.
     for _ in range(3):
         improved = False
 
